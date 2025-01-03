@@ -1,0 +1,110 @@
+{% include "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <main class="tm-main">
+                    
+        <div class="row tm-row">
+            <div class="col-12">
+                <hr class="tm-hr-primary tm-mb-55">
+                <!-- Video player 1422x800 -->
+                <img src = "{{blog.img.url}}" width="954" height="535" controls class="tm-mb-40">
+                   
+                </img>
+            </div>
+        </div>
+        <div class="row tm-row">
+            <div class="col-lg-8 tm-post-col">
+                <div class="tm-post-full">                    
+                    <div class="mb-4">
+                        <h2 class="pt-2 tm-color-primary tm-post-title">{{blog.title|title}}</h2>
+                        <p class="tm-mb-40">Posted on {{blog.date|date:'M d, Y'}} __ posted by {{blog.author|title}}</p>
+                        <p>
+                            {{blog.content}}
+                          
+                        </p>
+                        <span class="d-block text-right tm-color-primary">{{blog.date|date:'M d, Y'}}</span>
+                        
+                        <span class="d-block text-right tm-color-primary">
+                            {% for tag in blog.tags.all %}
+                            <a href="{% url 'get_tags' tag.slug %}" class="tm-color-primary">{{tag.name}}</a>
+                            {% endfor %}
+                        </span>
+                    </div>
+                    
+                    <!-- Comments -->
+                    <div>
+                        <h2 class="tm-color-primary tm-post-title">Comments</h2>
+                        <hr class="tm-hr-primary tm-mb-45">
+                        {% for coment in coment %}
+
+                        <div class="tm-comment tm-mb-45">
+                            <figure class="tm-comment-figure">
+                                <img src="{{coment.user.profile.image.url}}" alt="Image" class="mb-2 rounded-circle img-thumbnail">
+                                <figcaption class="tm-color-primary text-center">{{coment.user.username}}</figcaption>
+                            </figure>
+                            <div>
+                                <p>
+                                    {{coment.content}}
+                                </p>
+                                <div class="d-flex justify-content-between">
+                                    <a href="#" class="tm-color-primary">REPLY</a>
+                                    <span class="tm-color-primary">&nbsp;{{coment.crated_at|timesince}}</span>
+                                </div>
+                                  
+                                
+                                <div class="d-flex justify-content-right">
+                                    <form action="{% url 'coment-delet'%}" method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="id-delet" id="id-delet" value="{{coment.id}}"/>  
+                                    <input type="hidden" name="id" id="id" value="{{blog.id}}"/>    
+  
+                                    <button type="submit" class="tm-color-primary">delet</button>
+                                    </form>
+                                </div>
+                            </div>                                
+                        </div>
+                        {% endfor %}
+                        <form action="{% url 'save_comment' %}" class="mb-5 tm-comment-form" method="POST">
+                            {% csrf_token %}
+                            <h2 class="tm-color-primary tm-post-title mb-4">Your comment</h2>
+                           
+                            <div class="mb-4">
+                                <input type="hidden" name="id" id="id" value="{{blog.id}}"/>
+                                <input type="hidden" name="crated_at" id="crated_at" value="{{blog.crated_at}}"/>
+
+                                <input type="text" name="message" id="message" class="form-control">
+                            </div>
+                            <div class="text-right">
+                                <button type="submit" class="tm-btn tm-btn-primary tm-btn-small">Submit</button>                        
+                            </div>                                
+                        </form>                          
+                    </div>
+                </div>
+            </div>
+            <aside class="col-lg-4 tm-aside-col">
+                <div class="tm-post-sidebar">
+                    <hr class="mb-3 tm-hr-primary">
+                    <h2 class="mb-4 tm-post-title tm-color-primary">Categories</h2>
+                    <ul class="tm-mb-75 pl-5 tm-category-list">
+                        {% for tag in blog.tags.all %}
+                          <li><a href="{% url 'get_tags' tag.slug %}" class="tm-color-primary">{{tag.name}}</a></li>
+                        {% endfor %}
+                    </ul>
+                    <hr class="mb-3 tm-hr-primary">
+                    <h2 class="tm-mb-40 tm-post-title tm-color-primary">Related Posts</h2>
+                    {% for blog in blog.get_related_post_by_tag %}
+                    <a href="{{blog.get_absolute_url}}" class="d-block tm-mb-40">
+                        <figure>
+                            <img src="{{blog.img.url}}" alt="Image" class="mb-3 img-fluid">
+                            <figcaption class="tm-color-primary">{{blog.title|title}}</figcaption>
+                        </figure>
+                    </a>
+                    {% endfor %}
+                </div>                    
+            </aside>
+        </div>
+       
+    </main>
+</div>
+{% endblock %}
